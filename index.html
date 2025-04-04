@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vue</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
+  
+  <style>
+    body {
+  background: #20262E;
+  padding: 20px;
+  font-family: Helvetica;
+}
+
+#app {
+  background: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+li {
+  margin: 8px 0;
+}
+
+h2 {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+del {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+input[type="text"] {
+  padding: 10px;
+  width: 200px;
+}
+
+label .remove {
+  display: none;
+  color: red;
+}
+
+label:hover .remove {
+    display: inline-block;
+    margin-left: 10px;
+    color: red;
+    opacity: 0.5;
+}
+  </style>
+
+  
+</head>
+<body>
+  <div id="app">
+    <h2>To do: ({{ notCompleted.length }})</h2>
+    <input v-model="newToDo" @keyup.enter="onEnterPress" type="text" placeholder="Type something and press ENTER"/>
+    <ol>
+      <draggable v-model="notCompleted" group="todos" class="draggable">
+        <li v-for="(todo, index) in notCompleted" :key="`not-completed-${index}`">
+          <label>
+            <input v-model="todo.checked" type="checkbox" :key="`${todo.text}`"/>
+            <span>{{ todo.text }}</span>
+            <a href="#" class="remove" @click.prevent="removeTodo(todo.text)">Remove</a>
+          </label>
+        </li>
+      </draggable>
+    </ol>
+    <hr />
+    <h2>
+      Completed items: ({{ completed.length }})
+    </h2>
+    <ol>
+      <draggable v-model="completed" group="todos"class="draggable">
+        <li v-for="(todo, index) in completed" :key="`completed-${index}`">
+          <label>
+            <input v-model="todo.checked" type="checkbox" :key="`${todo.text}`" />
+            <span>{{ todo.text }}</span>
+            <a href="#" class="remove" @click.prevent="removeTodo(todo.text)">Remove</a>
+          </label>
+        </li>    
+      </draggable>
+    </ol>
+  </div>
+
+
+  <script>
+    Vue.component('draggable', window.vuedraggable);
+
+    new Vue({
+      el: "#app",
+
+      data: {
+        newToDo: null,
+        todos: [
+          { text: "Send job application", checked: false },
+          { text: "Learn about Vue", checked: false },
+          { text: "Learn about Fliplet", checked: false },
+          { text: "Play around in JSFiddle", checked: false },
+          { text: "Show us what you've got", checked: true }
+        ]
+      },
+      computed: {
+        notCompleted:{
+          get: function() {
+            return this.todos.filter(todo => !todo.checked);
+          },
+          set: function(newValue) {
+            this.todos = [...newValue.map(item => {
+              item.checked = false
+              return item;
+            }), ...this.todos.filter(todo => todo.checked)];
+          }
+        },
+        completed: {
+          get: function() {
+            return this.todos.filter(todo => todo.checked);
+          },
+          set: function(newValue) {
+            console.log(newValue)
+            this.todos = [...newValue.map(item => {
+              item.checked = true;
+              return item;
+            }), ...this.todos.filter(todo => !todo.checked)];
+          }
+        },
+      },
+      methods: {
+        onEnterPress() {
+          this.todos.push({text: this.newToDo, checked: false});
+          this.newToDo = null;
+        },
+        removeTodo(text) {
+          this.todos = this.todos.filter(todo => todo.text !== text);
+        },
+      }
+    })
+  </script>
+</body>
+</html>
