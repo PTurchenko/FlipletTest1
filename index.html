@@ -123,7 +123,6 @@ label:hover .remove {
             return this.todos.filter(todo => todo.checked);
           },
           set: function(newValue) {
-            console.log(newValue)
             this.todos = [...newValue.map(item => {
               item.checked = true;
               return item;
